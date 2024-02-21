@@ -1,7 +1,7 @@
 import flet as ft
 import time
 global value_time
-value_time = "Segundos"
+
 def main(page: ft.Page):
     page.title = "Desligamento"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER

@@ -1,44 +1,72 @@
 import flet as ft
 
-global value_time
-value_time = "Segundos"
-
 
 def main(page: ft.Page):
-    page.title = "Desligamento"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
-    def on_change(e):
-        global value_time
-        value_time = "minutos" if e.control.value else "segundos"
+    class ExtraParameters(ft.UserControl): # Add a control to the Column
+        def __init__(self):
+            super().__init__()
+            self.Box = ft.Column([])
 
-    page.add(
-        ft.Column(
-            [
-                ft.Text(f"Unidade de tempo: {value_time}"),
-                ft.Checkbox(
-                    value=value_time == "minutos",
-                    on_change=on_change,
-                ),
-            ]
-        )
-    )
+        def build(self):
+            return self.Box
 
-    def textbox_changed(e):
-        t.value = e.control.value
-        t.value += f" {value_time}"
+        def addParameterInput(self, key):
+            fileTextField = ft.TextField(
+                label=key, border=ft.InputBorder.UNDERLINE, hint_text="Select or input full path")
+            fileTextField.on_focus = lambda _: getFileDialog(fileTextField)
+            fileTextField.prefix =ft.Container(ft.FilledTonalButton("Select",icon = ft.icons.FILE_OPEN, on_click=lambda _:getFileDialog(fileTextField)))
+            self.Box.controls.append(fileTextField)
+            self.update()
 
-    t = ft.Text()
-    tb = ft.TextField(
-        label="Seu computador desligara em: ",
-        on_change=textbox_changed,
-    )
+    class ParameterCard(ft.UserControl):  # Cards for users to click
+        def __init__(self, title, description, callback, type='text'):
+            super().__init__()
+            self.title = title
+            self.description = description
+            self.callback = callback
+            self.type = type
 
-    page.add(tb, t)
+        def build(self):
+            return ft.Card(
+                content=ft.Container(
+                    content=ft.Column(
+                        [
+                            ft.ListTile(
+                                title=ft.Text(self.title),
+                                subtitle=ft.Text(self.description),
+                            ),
+                        ]
+                    ),
+                    on_click=lambda _: self.callback.addParameterInput(
+                        self.title),
+                    width=400,
+                    padding=10,
+                )
+            )
 
-    # Botão "Desligar!" no canto inferior da tela:
-    btn = ft.ElevatedButton("Desligar!")
-    page.add(btn)
+    def getFileDialog(targetTextField): 
+        get_input_file_dialog.pick_files(allow_multiple=False)
+        get_input_file_dialog.targetTextField = targetTextField
+
+    def get_input_file_result(e: ft.FilePickerResultEvent):
+        e.control.targetTextField.value = e.files[0].path if e.files else "Cancelled!"
+        e.control.page.update() # <---- TextField not updated
+
+    get_input_file_dialog = ft.FilePicker(on_result=get_input_file_result)
+
+    fileTextField = ft.TextField(label="This one works", border=ft.InputBorder.UNDERLINE, prefix=ft.Container(ft.Icon(ft.icons.FILE_OPEN), on_click=lambda _: getFileDialog(
+        fileTextField)), hint_text="Select file", on_focus=lambda _: getFileDialog(fileTextField)) # This one works
+
+
+    extra_parameters = ExtraParameters() # But ones in the Column do not work
+    
+    col = ft.Column([
+        fileTextField
+    ])
+
+    page.add(get_input_file_dialog, col, extra_parameters, ParameterCard(
+        "Add file", 'Click card to add a new line', extra_parameters))
 
 
 ft.app(target=main)
