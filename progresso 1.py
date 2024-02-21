@@ -23,6 +23,11 @@ class MainPage:
                             ft.TextField(
                                 label="Tempo:",
                             ),
+                            ft.Text(f" {self.value_time}"),
+                        ],
+                    ),
+                    ft.ElevatedButton(
+                        text="Desligar!",
                     ),
                 ]
             )
