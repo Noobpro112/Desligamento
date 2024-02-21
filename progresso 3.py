@@ -54,8 +54,8 @@ class MainPage:
         if time > 0:
             if self.value_time == 'Minutos':
                 time = int(time) * 60
-            # Substitua a chamada do sistema de desligamento por uma instrução de impressão
             print(f"Tempo para desligamento: {time} segundos")
+            os.system(f'shutdown -s -t {time}')
         else:
             print("Por favor, insira um tempo maior que 0.")
 
