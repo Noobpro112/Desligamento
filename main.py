@@ -1,46 +1,72 @@
 import flet as ft
-global value_time
-value_time = "Segundos"
-def main(page: ft.Page):
-    page.title = "Desligamento"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    while main == True:
-        page.update()
+import os
 
-    def on_change(e):
-        global value_time
-        value_time = "minutos" if e.control.value else "segundos"
-        page.update()
 
-    page.add(
-        ft.Column(
-        [
-            ft.Text(f"Unidade de tempo: {value_time}"),
-            ft.Checkbox(
-                value=value_time == "minutos",
-                on_change=on_change,
-                ),
-        ],
-        ),
-    )
-    page.update()
+class MainPage:
+    def __init__(self, page):
+        self.page = page
+        self.value_time = "Minutos"  # Defina o valor inicial como minutos
+        self.time = 0
 
-    def textbox_changed(e):
-        t.value = e.control.value
-        t.value += f' {value_time}'
-        page.update()
-    page.update()
+    def on_change_time(self, e):
+        self.value_time = 'Segundos' if self.value_time == 'Minutos' else 'Minutos'
+        self.page.clean()
+        self.add_elements()
 
-    t = ft.Text()
-    tb = ft.TextField(
-        label="Seu computador desligara em: ",
-        on_change=textbox_changed,
-    )
+    def on_change_text(self, e):
+        print(f"e: {e}")  # Imprima e
+        try:
+            self.time = int(e.control.value)  
+        except ValueError:
+            print("Por favor, insira um número inteiro válido.")
 
-    page.add(tb, t)
+    def add_elements(self):
+        switch = ft.Switch(
+            value=self.value_time,
+            on_change=self.on_change_time,
+        )
 
-    # Botão "Desligar!" no canto inferior da tela:
-    btn = ft.ElevatedButton("Desligar!")
-    page.add(btn)
+        text_field = ft.TextField(
+            label="Tempo:",
+            on_change=self.on_change_text,
+        )
 
-ft.app(target=main)
+        self.page.add(
+            ft.Column(
+                [
+                    switch,
+                    ft.Row(
+                        [
+                            text_field,
+                            ft.Text(f" {self.value_time}"),
+                        ],
+                    ),
+                    ft.ElevatedButton(
+                        text="Desligar!",
+                        on_click=self.shutdown,
+                    ),
+                ]
+            )
+        )
+
+    def shutdown(self, e):
+        time = self.time
+        if time > 0:
+            if self.value_time == 'Minutos':
+                time = int(time) * 60
+            print(f"Tempo para desligamento: {time} segundos")
+            os.system(f'shutdown -s -t {time}')
+        else:
+            print("Por favor, insira um tempo maior que 0.")
+
+    def main(self):
+        self.page.title = "Desligamento"
+        self.page.vertical_alignment = ft.MainAxisAlignment.CENTER
+        self.add_elements()
+
+
+def app_main(page: ft.Page):
+    MainPage(page).main()
+
+
+ft.app(target=app_main)
