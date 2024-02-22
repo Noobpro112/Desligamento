@@ -3,7 +3,7 @@ import os
 
 
 class MainPage:
-    def __init__(self, page):
+    def __init__(self, page):   
         self.page = page
         self.value_time = "Minutos"  # Defina o valor inicial como minutos
         self.time = 0
@@ -16,7 +16,7 @@ class MainPage:
     def on_change_text(self, e):
         print(f"e: {e}")  # Imprima e
         try:
-            self.time = int(e.control.value)  
+            self.time = int(e.control.value)
         except ValueError:
             print("Por favor, insira um número inteiro válido.")
 
