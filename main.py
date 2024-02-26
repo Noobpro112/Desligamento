@@ -9,7 +9,7 @@ class MainPage:
         self.time = 0
 
     def on_change_time(self, e):
-        self.value_time = 'Segundos' if self.value_time == 'Minutos' else 'Minutos'
+        self.value_time = 'Horas' if self.value_time == 'Minutos' else 'Minutos'
         self.page.clean()
         self.add_elements()
 
@@ -54,7 +54,9 @@ class MainPage:
         if time > 0:
             if self.value_time == 'Minutos':
                 time = int(time) * 60
-            print(f"Tempo para desligamento: {time} segundos")
+            if self.value_time == 'Horas':
+                time = int(time) * 3600
+            print(f"Tempo para desligamento: {time} Segundos")
             os.system(f'shutdown -s -t {time}')
         else:
             print("Por favor, insira um tempo maior que 0.")
